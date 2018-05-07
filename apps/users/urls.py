@@ -16,18 +16,22 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-
-
+from apps.users import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    # 全文检索
-    url(r'^search/', include('haystack.urls')),
-    url(r'^cart/', include('apps.cart.urls', namespace='cart')),
-    url(r'^orders/', include('apps.orders.urls', namespace='orders')),
-    url(r'^users/', include('apps.users.urls', namespace='users')),
+    # 视图函数
+    # url(r'^register$', views.register, name='register'),
+    # url(r'^do_register$', views.do_register, name='do_register'),
 
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^', include('apps.goods.urls', namespace='goods')),
-    # url(r'^$',)
+    # 类视图
+    url(r'^register$', views.RegisterView.as_view(), name='register'),
+
+    url(r'^active/(.+)$', views.ActiveView.as_view(), name='active'),
+
+    url(r'^login$', views.LoginView.as_view(), name='login'),
+    url(r'^logout$', views.LogoutView.as_view(), name='logout'),
+
+    url(r'^address$', views.UserAddressView.as_view(), name='address'),
+    url(r'^orders/(\d+)$', views.UserOrderView.as_view(), name='orders'),
+    url(r'^$', views.UserInfoView.as_view(), name='info'),
 ]

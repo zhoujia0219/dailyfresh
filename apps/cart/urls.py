@@ -16,18 +16,12 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-
-
+from apps.cart import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    # 全文检索
-    url(r'^search/', include('haystack.urls')),
-    url(r'^cart/', include('apps.cart.urls', namespace='cart')),
-    url(r'^orders/', include('apps.orders.urls', namespace='orders')),
-    url(r'^users/', include('apps.users.urls', namespace='users')),
+    url(r'^add$', views.AddCartView.as_view(), name='add'),
+    url(r'^update$', views.UpdateCartView.as_view(), name='update'),
+    url(r'^delete$', views.CartDeleteView.as_view(), name='delete'),
 
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^', include('apps.goods.urls', namespace='goods')),
-    # url(r'^$',)
+    url(r'^$', views.CartInfoView.as_view(), name='info'),
 ]

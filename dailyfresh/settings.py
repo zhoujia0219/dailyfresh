@@ -27,8 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
+AUTH_USER_MODEL = 'users.User'
+
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -37,8 +38,19 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps',
+    'apps.goods',
+    'apps.cart',
+    'apps.orders',
+    'apps.users',
+    'tinymce',
+    'haystack', # 使用haystack全文检索框架
 )
+
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,8 +68,7 @@ ROOT_URLCONF = 'dailyfresh.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,8 +89,12 @@ WSGI_APPLICATION = 'dailyfresh.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db_dailyfresh',
+        'USER': 'root',
+        'PASSWORD': 'mysql',
+        'HOST': 'localhost',
+        'PORT': 3306,
     }
 }
 
@@ -87,9 +102,9 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -102,3 +117,61 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'    # 导入邮件模块
+EMAIL_HOST = 'smtp.163.com'                 # 邮箱服务器地址（不同公司的邮箱服务器地址不一样）
+EMAIL_PORT = 25                             # 邮箱服务器端口（默认都为25）
+EMAIL_HOST_USER = 'zhoujia0219@163.com'       # 发件人（天天生鲜官方邮箱账号）
+EMAIL_HOST_PASSWORD = 'zj850219x'           # 邮箱客户端授权码，非邮箱登录密码
+EMAIL_FROM = '天天生鲜<zhoujia0219@163.com>'   # 收件人接收到邮件后，显示在‘发件人’中的内容，如下图
+
+# 使用redis保存session数据
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_HOST = 'localhost'
+SESSION_REDIS_PORT = 6379
+SESSION_REDIS_DB = 2
+SESSION_REDIS_PASSWORD = ''
+SESSION_REDIS_PREFIX = 'session'
+
+# django项目的缓存配置
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": ""
+        }
+    }
+}
+
+# session数据缓存到Redis中
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+
+# 如果未登录，则跳转到如下url地址
+LOGIN_URL = '/users/login'
+
+DEFAULT_FILE_STORAGE = 'utils.fdfs.storage.FdfsStorage'
+
+# 配置haystack框架
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 使用whoosh搜索引擎
+        #  'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        # 使用结巴分词
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        # 指定生成的索引库保存在哪个目录下
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+
+# 当添加、修改、删除了数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+# 设置全文检索结果每页显示2条数据
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 2

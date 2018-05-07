@@ -16,18 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-
-
+from apps.goods import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    # 全文检索
-    url(r'^search/', include('haystack.urls')),
-    url(r'^cart/', include('apps.cart.urls', namespace='cart')),
-    url(r'^orders/', include('apps.orders.urls', namespace='orders')),
-    url(r'^users/', include('apps.users.urls', namespace='users')),
+    url(r'^index$', views.IndexView.as_view(), name='index'),
+    url(r'^detail/(\d+)$', views.DetailView.as_view(), name='detail'),
 
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^', include('apps.goods.urls', namespace='goods')),
-    # url(r'^$',)
+    url(r'^list/(\d+)/(\d+)$', views.ListView.as_view(),name='list'),
+
+    url(r'^search/$', include('haystack.urls')),
 ]

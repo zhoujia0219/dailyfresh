@@ -16,18 +16,14 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-
-
+from apps.orders import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    # 全文检索
-    url(r'^search/', include('haystack.urls')),
-    url(r'^cart/', include('apps.cart.urls', namespace='cart')),
-    url(r'^orders/', include('apps.orders.urls', namespace='orders')),
-    url(r'^users/', include('apps.users.urls', namespace='users')),
-
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^', include('apps.goods.urls', namespace='goods')),
-    # url(r'^$',)
+    url(r'^place$', views.PlaceOrderView.as_view(), name='place'),
+    url(r'^commit$', views.CommitOrderView.as_view(), name='commit'),
+    # 支付: /orders/pay
+    url(r'^pay$', views.OrderPayView.as_view(), name='pay'),
+    # 查询支付结果: /orders/check
+    url(r'^check$', views.CheckPayView.as_view(), name='check'),
 ]
+# 2016091500513483
